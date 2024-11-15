@@ -99,9 +99,6 @@ struct ContentView: View {
             
         }
         
-        
-        
-        
     }
 }
             
