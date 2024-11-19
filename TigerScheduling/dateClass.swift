@@ -42,7 +42,7 @@ class date{
     /**
      Stores user inputted data if they wish to enter a memo about an event they have.
      This will take in data from the UI like the rest of the setters.
-     
+     - Parameter message: string
      - return: none
      */
     func readMemo(message:String){
@@ -68,8 +68,62 @@ class date{
            return "\(Month)/\(Day)/\(Year)"
        }
     
+    /**
+     This function ensures valid dates by checking leap years, maxima and minima dates, correct months, and as well as preventing the creation of past dates.
+     - Parameter entry: the date that is to be checked (self)
+     - return : Boolean
+     */
+    func checkValidDate(entry: date)->Bool{
+        let today = Date()
+        var currentDay: Int = Calendar.current.component(.day, from: today)
+        var currentYear: Int = Calendar.current.component(.year, from: today)
+        var currentMonth: Int = Calendar.current.component(.month, from: today)
+        
+        //Boundary handling
+        if entry.Month > 12 || entry.Month < 1{
+            return false
+        }
+        
+        else if entry.Day < 1 || entry.Day > 31 {
+            return false
+        }
+        
+        else if (entry.Month == 1 || entry.Month == 3 || entry.Month == 5 || entry.Month == 7 || entry.Month == 8 || entry.Month == 10 || entry.Month == 12) && entry.Day > 31 {
+            return false
+        }
+        
+        else if (entry.Month == 4 || entry.Month == 6 || entry.Month == 9 || entry.Month == 11) && entry.Day > 30 {
+            return false
+        }
+        
+                
+        //leap year handling
+        else if entry.Month == 02{
+            //if it is not a leap year
+            if (entry.Year % 4 != 0 || (entry.Year % 100 == 0 && entry.Year % 400 != 0)) && entry.Day > 28 {
+                return false;
+            }
+            
+           //if it is a leap year
+            else if ((entry.Year % 4 == 0 && (entry.Year % 100 != 0 || entry.Year % 400 == 0))) && entry.Day > 29{
+                return false
+            }
+    
+        }
+        
+        // current date handling
+        let entryDate = Calendar.current.date(from: DateComponents(year: entry.Year, month: entry.Month, day: entry.Day)) ?? today
+        
+        if entryDate < today {
+                return false
+            }
+
+        
+        
+        
+        return true
+    }
     
     
-    
-    
+    //end of class for coding purposes
 }

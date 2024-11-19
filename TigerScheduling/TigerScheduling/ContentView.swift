@@ -19,17 +19,20 @@ struct ContentView: View {
             VStack {
                 
                 Spacer()
+                
                 Text("Hello user! How can I assist you today?")
                     .offset(x: 0, y:-70)
                     .font(.largeTitle)
                     .foregroundColor(.white)
                     .padding()
+                
                 Image("busyTiger")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .safeAreaPadding()
                     .offset(x:0, y:-100)
                     .padding()
+                
                     //Buttons need logic
                 HStack{
                     Button("Schedule") {
@@ -88,8 +91,6 @@ struct ContentView: View {
                 
                 Spacer()
             }
-            
-            
             
             
             
