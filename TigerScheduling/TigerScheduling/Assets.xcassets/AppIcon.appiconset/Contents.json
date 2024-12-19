@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "pixel_art_clock_school.jpg",
+      "filename" : "Clemson_Planner_1024x1024.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -13,6 +13,7 @@
           "value" : "dark"
         }
       ],
+      "filename" : "Clemson_Planner_Dark_Mode_1024x1024.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"

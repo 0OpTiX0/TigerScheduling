@@ -8,8 +8,8 @@
 import Foundation
 
 
-
-class date{
+//Observable objects are objects that notify SwiftUI or other observers that data has changed. They are teh subjects!
+class date: ObservableObject{
     private var Month: Int
     private var Day: Int
     private var Year: Int
@@ -25,6 +25,8 @@ class date{
         self.UIdata  = UIdata
     }
     
+    
+    
     /**
      This is a setter for the day month and year parameters inside of each date class.
      - Parameter day: The day to be set for each date object
@@ -39,34 +41,47 @@ class date{
         self.Year = year
     }
     
+    
+    
+    
     /**
      Stores user inputted data if they wish to enter a memo about an event they have.
      This will take in data from the UI like the rest of the setters.
      - Parameter message: string
-     - return: none
+     - Returns: none
      */
-    func readMemo(message:String){
+    func editMemo(message:String){
         UIdata = message
     }
     
-    /**
-        Returns private data sotred in UIdata
-     
-     - return: String
-     */
     
+    
+    
+    
+    /**
+    Relays the objects UIdata
+     - Returns: Attached date message
+     
+     */
     func viewMemo()->String{
         return UIdata
     }
     
+    
+    
+    
+    
     /**
         Relays  private data stored in  Month, Day, and Year
      
-     - return: String
+   - Returns: Month, Day, and Year stored inside of the object.
      */
     func getDate() -> String {
            return "\(Month)/\(Day)/\(Year)"
        }
+    
+    
+    
     
     /**
      This function ensures valid dates by checking leap years, maxima and minima dates, correct months, and as well as preventing the creation of past dates.
@@ -75,9 +90,9 @@ class date{
      */
     func checkValidDate(entry: date)->Bool{
         let today = Date()
-        var currentDay: Int = Calendar.current.component(.day, from: today)
-        var currentYear: Int = Calendar.current.component(.year, from: today)
-        var currentMonth: Int = Calendar.current.component(.month, from: today)
+        var _: Int = Calendar.current.component(.day, from: today)
+        var _: Int = Calendar.current.component(.year, from: today)
+        var _: Int = Calendar.current.component(.month, from: today)
         
         //Boundary handling
         if entry.Month > 12 || entry.Month < 1{

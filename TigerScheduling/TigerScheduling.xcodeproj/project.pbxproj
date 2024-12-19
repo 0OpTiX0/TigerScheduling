@@ -9,13 +9,11 @@
 /* Begin PBXBuildFile section */
 		C371F9232CE7D6D7008679B6 /* dateClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C371F9222CE7D6D7008679B6 /* dateClass.swift */; };
 		C371F9252CE7F268008679B6 /* dateList.swift in Sources */ = {isa = PBXBuildFile; fileRef = C371F9242CE7F268008679B6 /* dateList.swift */; };
-		C3AE5DEF2CDEE85F0097E2FC /* appController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3AE5DEE2CDEE85F0097E2FC /* appController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		C371F9222CE7D6D7008679B6 /* dateClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dateClass.swift; sourceTree = "<group>"; };
 		C371F9242CE7F268008679B6 /* dateList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = dateList.swift; sourceTree = "<group>"; };
-		C3AE5DEE2CDEE85F0097E2FC /* appController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = appController.swift; path = TigerScheduling/appController.swift; sourceTree = "<group>"; };
 		C3B9786A2CDC6BC1007AA976 /* TigerScheduling.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TigerScheduling.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -49,7 +47,6 @@
 				C371F9222CE7D6D7008679B6 /* dateClass.swift */,
 				C3C5A7E72CEC1B6100764ECD /* Tests */,
 				C371F9242CE7F268008679B6 /* dateList.swift */,
-				C3AE5DEE2CDEE85F0097E2FC /* appController.swift */,
 				C3B9786C2CDC6BC1007AA976 /* TigerScheduling */,
 				C3B9786B2CDC6BC1007AA976 /* Products */,
 			);
@@ -139,7 +136,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C371F9232CE7D6D7008679B6 /* dateClass.swift in Sources */,
-				C3AE5DEF2CDEE85F0097E2FC /* appController.swift in Sources */,
 				C371F9252CE7F268008679B6 /* dateList.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

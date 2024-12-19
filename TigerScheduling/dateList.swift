@@ -6,88 +6,97 @@
 //
 
 import Foundation
-//import UIKit
+import UIKit
+import SwiftUI
 
-class dateList{
-    var List: [date]
-    
+class dateList: ObservableObject {
+    @Published var List: [date]
+
     /**
      Constructor for Date List. It will create an object(s) that store lists of date objects.
      */
-    init(List:[date]){
-        self.List = []
+    init(List: [date]) {
+        self.List = List
     }
-    
-    
+
     /**
-     Creates new date obects based on UI handled by the appController. It will store the month, year, day, and any user input regarded with it
-     - Parameter month: The user defined month
-     - Parameter year: The user defined year
-     - Parameter day: The user defined day
-     - Parameter uI: Any user input that will be displayed as a memo by UI
-     - Return : date
+     Creates new date objects based on UI handled by the appController. It will store the month, year, day, and any user input regarded with it.
+     - Parameter month: The user-defined month.
+     - Parameter year: The user-defined year.
+     - Parameter day: The user-defined day.
+     - Parameter uI: Any user input that will be displayed as a memo by UI.
+     - Returns: A valid `date` object, or `nil` if the date is invalid.
      */
-    func createDate(month:Int, day:Int, year:Int, uI:String) -> date{
-        
-        //this is how you create a new object in swift! You initalize a new date by calling the constructor!
-        let newDate: date = date.init(Month: month, Day:day, Year:year, UIdata: uI)
-        
+    func createDate(month: Int, day: Int, year: Int, uI: String) -> date? {
+        let newDate = date(Month: month, Day: day, Year: year, UIdata: uI)
+
+        if !newDate.checkValidDate(entry: newDate) {
+            print("Warning: Invalid date created - \(month)/\(day)/\(year)\n")
+            return nil
+        }
+
         return newDate
     }
-    
+
     /**
-     Adds a new date object to the list of objects
+     Adds a new date object to the list of objects.
      - Parameter entry: The newly created date.
      */
-    func addDateToList(entry:date){
+    func addDateToList(entry: date) {
         List.append(entry)
     }
-    
-    /**
-     Removes a date object from the list of date objects
-     */
-    func removeDateFromList(item: date){
-        
-    }
-    
-    /**
-     Changes any information that the user needs to be changed with a date objevt theyve created.
-     - Parameter Item: the date to be edited
-     - Parameter month: The user's changed month
-     - Parameter year: The user's changed year
-     - Parameter day: The user's changed day
-     - Parameter uI: The edited user input that will be displayed as a memo by UI
-     - Return : date
 
+    /**
+     Removes a date object from the list of date objects.
+     - Parameter index: An integer representing the location of the selected item.
      */
-    func editDate(Item: date, month:Int, day: Int, year: Int, uI: String) -> date{
-        
-        
-        
-        return Item
+    func removeDateFromList(index: Int) {
+        guard index >= 0 && index < List.count else {
+            print("Error: Index out of bounds.\n")
+            return
+        }
+
+        List.remove(at: index)
     }
-    
-    //View List function? Handled and rendered by the UI...
-    
-    //Need something to allow UI to see information from list. Needs details of each class. day, month, year, and UI.
-   
-    //Need logic for reminder. Figure out how to use notifications to set reminders (thats what the app is for. duh!)
-    
-    //Need logic for settings (idk what settings i need to add but hey, it works.)
-    //Settings to consider: Notification prefs (BOOL), Time zone stuff, UserDefaults???
-    
-    
-    
-    
-    
-    //FUTURE STUFF:
-    //Might add compatibility with watch! or even macOS(maybe)!
-    //Def work on setting times to allow reminders by the hour.
-    //Update the UI so it looks pretty.
-    //Thats about it... Who knows what might be next V(;D)V
-    
-    
-    //end of class (For coding purposes)
+
+    /**
+     Changes any information that the user needs to be changed with a date object they've created.
+     - Parameter index: The index where the desired date is to be changed.
+     - Parameter month: The user's changed month.
+     - Parameter year: The user's changed year.
+     - Parameter day: The user's changed day.
+     - Parameter uI: The edited user input that will be displayed as a memo by UI.
+     - Returns: The updated `date` object.
+     */
+    func editDate(index: Int, month: Int, day: Int, year: Int, uI: String) -> date? {
+        guard index >= 0 && index < List.count else {
+            print("Error: Index out of bounds.\n")
+            return nil
+        }
+
+        let currentDate = List[index]
+        currentDate.setDate(day: day, month: month, year: year)
+        currentDate.editMemo(message: uI)
+        return currentDate
+    }
+
+    /**
+     Helper function that uses the private information inside of a date object and uses the provided information to search for the specific index inside of the current list.
+     If the date is found, return its index. If not, return `-1`.
+     - Parameter targetDate: The date that is being searched for.
+     - Returns: The index of the date in the list, or `-1` if not found.
+     */
+    func findDateIndex(targetDate: date) -> Int {
+        return List.firstIndex(where: { $0.getDate() == targetDate.getDate() }) ?? -1
+    }
+
+    /**
+     Retrieves all date objects in the list formatted as strings for UI purposes.
+     - Returns: An array of strings containing the date and memo information for each entry.
+     */
+    func viewAllDates() -> [String] {
+        return List.map { "\($0.getDate()) - \($0.viewMemo())" }
+    }
 }
 
 

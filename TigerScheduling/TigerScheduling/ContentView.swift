@@ -3,106 +3,88 @@
 //  TigerScheduling
 //
 //  Created by Joseph Laudati on 11/6/24.
-//
+
+
+// '$' before a variable tells SwiftUI that a variable can be read or written into.
+// @State makes variables modifyable by the UI.
+//ForEach is like a for loop.
+
 
 import SwiftUI
 
 struct ContentView: View {
+    let currentDate = Date()
+    let calendar = Calendar.current
+    
+    
+    @State private var userDay: Int = 1
+    @State private var userMonth: Int = 1
+    @State private var userYear: Int = 2024
+    @State private var userData = ""
+    
     var body: some View {
-        
         ZStack{
-            Color.purple
-                .ignoresSafeArea()
-            Color(Color.orange)
-                .safeAreaPadding()
             
-            VStack {
-                
-                Spacer()
-                
-                Text("Hello user! How can I assist you today?")
-                    .offset(x: 0, y:-70)
-                    .font(.largeTitle)
-                    .foregroundColor(.white)
-                    .padding()
-                
-                Image("busyTiger")
+            NavigationStack {
+                ZStack{
+                    Color(UIColor.purple)
+                        .frame(width: 1000, height: 100)
+                    Image("Tiger")
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .safeAreaPadding()
-                    .offset(x:0, y:-100)
-                    .padding()
-                
-                    //Buttons need logic
-                HStack{
-                    Button("Schedule") {
-                        /*@START_MENU_TOKEN@*//*@PLACEHOLDER=Action@*/ /*@END_MENU_TOKEN@*/
-                    }
-                    .font(.title)
-                    .offset(x:-20 ,y:-100)
-                    
-                    Image(systemName: "book")
-                        .foregroundColor(Color.blue)
-                        .font(.title)
-                        .offset(x:-20 ,y:-100)
-                    
-                    
-                    Button("Remove"){
-                        
-                    }
-                    .font(.title)
-                    .offset(x:10 ,y:-100)
-                    
-                    Image(systemName: "eraser.line.dashed")
-                        .font(.title)
-                        .foregroundColor(Color.blue)
-                        .offset(x:10 ,y:-100)
-                    
-                }
-                //Buttons need logic
-                HStack{
-                    Button("Edit"){
-                        
-                    }
-                    .font(.title)
-                    .foregroundColor(Color.blue)
-                    .offset(x:12,y:-60)
-                    
-                    Image(systemName: "square.and.pencil")
-                        .font(.title)
-                        .foregroundColor(Color.blue)
-                        .offset(x:12 ,y:-63)
-                    
-                    Button("Settings"){
-                        
-                    }
-                    .font(.title)
-                    .foregroundColor(Color.blue)
-                    .offset(x:42 ,y:-63)
-                    
-                    Image(systemName: "wrench")
-                        .font(.title)
-                        .foregroundColor(Color.blue)
-                        .offset(x:42 ,y:-63)
-                    
+                    .scaledToFit()
+                    .frame(width: 100, height: 100)
                     
                 }
                 
                 
-                Spacer()
+                ZStack{
+                    
+                    
+                    Color(UIColor.orange)
+                   
+                    
+                    Form {
+                       
+                        Section("Your Current Things to do") {
+                            Text("PLACEHOLDER")
+                        }
+                        
+                        
+                        Section(""){
+                            Picker("Pick a day", selection: $userDay){
+                                ForEach(1..<30){
+                                    Text("\($0)")
+                                }
+                            }
+                            .pickerStyle(.navigationLink)
+                        }
+                        
+                        Button("Add A Date \(userData)") {
+                            userData = "Tapped!"
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                                userData = ""
+                            }
+                        }
+                        
+                        Text(userData)
+                    }
+                    .navigationTitle("Tiger Scheduling")
+                    .scrollContentBackground(.hidden)
+                }
+                
+        
+                    
+               
+                
             }
-            
-            
-            
-            
-            
-            
             
         }
         
     }
 }
-            
-    #Preview {
+
+#Preview {
     ContentView()
 }
+
+
