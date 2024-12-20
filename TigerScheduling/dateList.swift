@@ -10,12 +10,12 @@ import UIKit
 import SwiftUI
 
 class dateList: ObservableObject {
-    @Published var List: [date]
+    @Published var List: [DateModel]
 
     /**
      Constructor for Date List. It will create an object(s) that store lists of date objects.
      */
-    init(List: [date]) {
+    init(List: [DateModel]) {
         self.List = List
     }
 
@@ -27,8 +27,8 @@ class dateList: ObservableObject {
      - Parameter uI: Any user input that will be displayed as a memo by UI.
      - Returns: A valid `date` object, or `nil` if the date is invalid.
      */
-    func createDate(month: Int, day: Int, year: Int, uI: String) -> date? {
-        let newDate = date(Month: month, Day: day, Year: year, UIdata: uI)
+    func createDate(month: Int, day: Int, year: Int, uI: String) -> DateModel? {
+        let newDate = DateModel(Month: month, Day: day, Year: year, UIdata: uI)
 
         if !newDate.checkValidDate(entry: newDate) {
             print("Warning: Invalid date created - \(month)/\(day)/\(year)\n")
@@ -42,7 +42,7 @@ class dateList: ObservableObject {
      Adds a new date object to the list of objects.
      - Parameter entry: The newly created date.
      */
-    func addDateToList(entry: date) {
+    func addDateToList(entry: DateModel) {
         List.append(entry)
     }
 
@@ -68,7 +68,7 @@ class dateList: ObservableObject {
      - Parameter uI: The edited user input that will be displayed as a memo by UI.
      - Returns: The updated `date` object.
      */
-    func editDate(index: Int, month: Int, day: Int, year: Int, uI: String) -> date? {
+    func editDate(index: Int, month: Int, day: Int, year: Int, uI: String) -> DateModel? {
         guard index >= 0 && index < List.count else {
             print("Error: Index out of bounds.\n")
             return nil
@@ -86,7 +86,7 @@ class dateList: ObservableObject {
      - Parameter targetDate: The date that is being searched for.
      - Returns: The index of the date in the list, or `-1` if not found.
      */
-    func findDateIndex(targetDate: date) -> Int {
+    func findDateIndex(targetDate: DateModel) -> Int {
         return List.firstIndex(where: { $0.getDate() == targetDate.getDate() }) ?? -1
     }
 

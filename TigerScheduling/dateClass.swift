@@ -9,11 +9,12 @@ import Foundation
 
 
 //Observable objects are objects that notify SwiftUI or other observers that data has changed. They are teh subjects!
-class date: ObservableObject{
-    private var Month: Int
-    private var Day: Int
-    private var Year: Int
-    private var UIdata: String
+class DateModel: ObservableObject, Identifiable{
+    let id = UUID()
+    @Published var Month: Int
+    @Published var Day: Int
+    @Published var Year: Int
+    @Published var UIdata: String
     
     /**
     Constructor initializes Month, Day, Year, and UI Data
@@ -88,7 +89,7 @@ class date: ObservableObject{
      - Parameter entry: the date that is to be checked (self)
      - return : Boolean
      */
-    func checkValidDate(entry: date)->Bool{
+    func checkValidDate(entry: DateModel)->Bool{
         let today = Date()
         var _: Int = Calendar.current.component(.day, from: today)
         var _: Int = Calendar.current.component(.year, from: today)
