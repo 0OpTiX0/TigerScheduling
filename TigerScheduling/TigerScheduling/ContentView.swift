@@ -4,6 +4,8 @@
 //
 //  Created by Joseph Laudati on 11/6/24.
 
+//  Copyright © 2024 Joseph Laudati. All rights reserved.
+
 
 // '$' before a variable tells SwiftUI that a variable can be read or written into.
 // @State makes variables modifyable by the UI.

@@ -3,7 +3,7 @@
 //  TigerScheduling
 //
 //  Created by Joseph Laudati on 11/15/24.
-//
+//  Copyright © 2024 Joseph Laudati. All rights reserved.
 
 import Foundation
 import UIKit
