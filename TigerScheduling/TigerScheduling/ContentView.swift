@@ -26,9 +26,7 @@ struct ContentView: View {
     @FocusState private var amountIsFocused: Bool
 
     
-    @State private var listOfDates: [DateModel] = [
-        DateModel(Month: 01, Day: 03, Year: 2025, UIdata: "Go and buy gifts for mom")
-    ]
+    @State private var listOfDates: [DateModel] = []
     @State private var userDay: Int = 1
     @State private var userMonth: Int = 1
     @State private var userYear: Int = 2024
@@ -55,7 +53,9 @@ struct ContentView: View {
                     
                     
                     Form {
-                       
+                       /**
+                        Section displays information related to our created date.
+                        */
                         Section("Your Current Things to do") {
                             if(listOfDates.isEmpty){
                                 Text("No dates added.")
@@ -63,8 +63,9 @@ struct ContentView: View {
                             else {
                                 ForEach(listOfDates) { date in
                                     VStack(alignment: .leading) {
-                                        Text(String(format: "%d/%d/%d", date.Day, date.Month, date.Year))
+                                        Text(String(format: "%d/%d/%d", date.Month, date.Day, date.Year))
                                             .font(.headline)
+                                        
                                         Text(date.UIdata)
                                             .font(.subheadline)
                                             .foregroundColor(.gray)
@@ -72,10 +73,12 @@ struct ContentView: View {
                                 }
                             }
                         }
-                        
+                        /**
+                        Section controls the day picker
+                         */
                         Section("Day"){
                             Picker("Enter day:", selection: $userDay){
-                                ForEach(1..<32){
+                                ForEach(1...31, id: \.self){
                                     Text("\($0)")
                                 }
                             }
@@ -83,9 +86,12 @@ struct ContentView: View {
                             .frame(height: 80)  // Constrain the height of the picker
                         }
                         
+                        /**
+                        Section controls month picker
+                         */
                         Section("Month"){
                             Picker("Enter month: ", selection: $userMonth){
-                                ForEach(1..<13){
+                                ForEach(1...12, id: \.self){
                                     Text("\($0)")
                                 }
                             }
@@ -93,6 +99,11 @@ struct ContentView: View {
                             .frame(height: 80)
                         }
                         
+                        /**
+                         Section controls year text field.
+                         Precondition: User is limited to picking dates with in 10 years of the current year. They cannot pick
+                         prior years.
+                         */
                         Section("Year"){
                             TextField("Enter Year: ", value: $userYear, formatter: NumberFormatter())
                                 .keyboardType(.numberPad)
@@ -112,6 +123,11 @@ struct ContentView: View {
                             }
                         }
                         
+                        
+                        /**
+                         Section controls the memo logic.
+                         Precondtion: User must use strings AND can enter up to 30 characters.
+                         */
                         Section("Add memo") {
                             TextField("Enter a short memo", text: $userData)
                                 .focused($amountIsFocused)
@@ -131,15 +147,32 @@ struct ContentView: View {
                         //.padding() Adds spacing around the text
                         //.background(Color.blue) Sets the button's background color
                         //.cornerRadius(10) Adds rounded corners
-                        // More test functions. Will not be incorporated in final design.
+                        
+                        
+                        
+                        
+                        /**
+                         Allows the user to add dates to their list
+                         */
                         Button("Add Date") {
-                          
+                            let newItem = DateModel(Month: userMonth, Day: userDay, Year: userYear, UIdata: userData)
+                            listOfDates.append(newItem)
                         }
                         .font(.headline)
                         .frame(maxWidth: .infinity) // Makes the button expand horizontally
                         .multilineTextAlignment(.center) // aligns the text
                         
                         
+                        Button("Remove Date"){
+                            if(!listOfDates.isEmpty){
+                                listOfDates.removeLast()
+                            }
+                            
+                        }
+                            .font(.headline)
+                            .foregroundColor(.red)
+                            .frame(maxWidth: .infinity)
+                            .multilineTextAlignment(.center)
                         
                     }
                     .navigationTitle("Tiger Scheduling")
