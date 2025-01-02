@@ -32,7 +32,9 @@ struct ContentView: View {
     @State private var userYear: Int
     @State private var userHour: Int
     @State private var userData: String
-    
+    @State private var userTime: String
+    @State private var times: [String] = ["AM", "PM"]
+    @State private var reminderTime: Int
     
     //initalize values to current month, day and year so that your app launches with the correct date.
     init(){
@@ -42,7 +44,18 @@ struct ContentView: View {
         _userYear = State(initialValue: currentYear)
         _userHour = State(initialValue: currentHour)
         _userData = State(initialValue: "")
+        _reminderTime = State(initialValue: 1)
+        _userTime = State(initialValue: "")
+        
+        if (userHour >= 13) {
+            _userTime = State(initialValue: "PM")
+        }
+        else{
+            _userTime = State(initialValue: "AM")
+        }
+        
     }
+    
     
     
     
@@ -144,20 +157,54 @@ struct ContentView: View {
                          Precondtion: User must use strings AND can enter up to 30 characters.
                          */
                         Section("Add memo") {
-                            TextField("Enter a short memo", text: $userData)
+                            TextField("Enter a short memo. Character Limit: 60", text: $userData)
                                 .focused($amountIsFocused)
                                 .onChange(of: userData, initial: true) { oldValue, newValue in
-                                    if newValue.count > 30 {
+                                    if newValue.count > 60 {
                                         userData = String(newValue.prefix(30))
                                     }
                                 }
                         }
                         
                         Section("What time would you like to be reminded at?"){
-                            
+                            HStack(alignment: .center){
+                                Picker("Select Hour",selection: $userHour){
+                                    ForEach(1...12, id: \.self) { hour in
+                                        Text("\(hour)").tag(hour) // Add tags to ensure proper selection handling
+                                    }
+                                }
+                                .pickerStyle(.wheel)
+                                .frame(width: 200, height: 70)
+                                
+                                Picker("What time of Day", selection: $times){
+                                    ForEach(times, id: \.self){
+                                        time in Text(time)
+                                    }
+                                }
+                                .pickerStyle(.wheel)
+                                .frame(width: 100, height: 70)
+                            }
                         }
                         
-                        Section("When do you want to be reminded?"){}
+                        /*
+                         reminder Time is defunt at the moment. Implementation will be needed to properly assign it a trigger.
+                         
+                         */
+                        Section("When do you want to be reminded?"){
+                            HStack{
+                                Picker("Select when to be reminded", selection: $reminderTime){
+                                    ForEach(1...7, id: \.self){
+                                        reminder in Text("\(reminder)")
+                                    }
+                                }
+                                .pickerStyle(.wheel)
+                                .frame(width: 250, height:70 )
+                                
+                                Text("Day(s).")
+                
+                            }
+                            
+                        }
                         
                         
                         
@@ -179,6 +226,7 @@ struct ContentView: View {
                             
                             notifications(for: newItem)
                             
+                            userHour = currentHour
                             userMonth = currentMonth
                             userDay = currentDay
                             userYear = currentYear
@@ -230,9 +278,11 @@ struct ContentView: View {
                 // Use the instance's Month, Day, and Year
                 // Need to program hour and minute to get this to work. Work on it later.
                 var dateComponents = DateComponents()
+                dateComponents.hour = dateInstance.Hour
                 dateComponents.year = dateInstance.Year
                 dateComponents.month = dateInstance.Month
                 dateComponents.day = dateInstance.Day
+                
                 
                 
                 /*
