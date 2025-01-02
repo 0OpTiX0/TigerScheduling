@@ -11,6 +11,7 @@ import Foundation
 //Observable objects are objects that notify SwiftUI or other observers that data has changed. They are teh subjects!
 class DateModel: ObservableObject, Identifiable{
     let id = UUID()
+    @Published var Hour: Int
     @Published var Month: Int
     @Published var Day: Int
     @Published var Year: Int
@@ -19,7 +20,8 @@ class DateModel: ObservableObject, Identifiable{
     /**
     Constructor initializes Month, Day, Year, and UI Data
      */
-    init(Month: Int, Day: Int, Year: Int, UIdata: String) {
+    init(Month: Int, Day: Int, Year: Int, UIdata: String, Hour: Int) {
+        self.Hour = Hour
         self.Month = Month
         self.Day = Day
         self.Year = Year
@@ -30,11 +32,15 @@ class DateModel: ObservableObject, Identifiable{
     
     /**
      This is a setter for the day month and year parameters inside of each date class.
+     
+     - Precondition: day, month, AND year values must be within the respective ranges that the Gregorian calendar follows. Day: 1 thru 31 (depending on month) Year (within 10 years of current year)
+     Month: 1 thru 12 (representing January through December
+     
      - Parameter day: The day to be set for each date object
      - Parameter month: The month to be set for each date object
      - Parameter year: The year to be set for each date object
      
-     - return: String
+     - returns: None
      */
     func setDate(day: Int, month:Int, year:Int ){
         self.Day = day
@@ -43,6 +49,20 @@ class DateModel: ObservableObject, Identifiable{
     }
     
     
+    /**
+     This is a settter for the hour of each date class. It takes in an integer ranging from 1-24. 1-12 representing the AM, 13-24 representing the PM
+     - Precondition: Hour must be between 1- and 24.
+     - Parameter hour: The hour to be set for each date object
+     - returns: None
+     */
+    func setHour(hour: Int){
+        if(hour >= 13){
+            Hour = hour - 12
+        }
+        else{
+            Hour = hour
+        }
+    }
     
     
     /**
