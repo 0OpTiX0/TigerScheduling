@@ -12,6 +12,7 @@ import Foundation
 class DateModel: ObservableObject, Identifiable{
     let id = UUID()
     @Published var Hour: Int
+    @Published var Time: String
     @Published var Month: Int
     @Published var Day: Int
     @Published var Year: Int
@@ -20,12 +21,13 @@ class DateModel: ObservableObject, Identifiable{
     /**
     Constructor initializes Month, Day, Year, and UI Data
      */
-    init(Month: Int, Day: Int, Year: Int, UIdata: String, Hour: Int) {
+    init(Month: Int, Day: Int, Year: Int, UIdata: String, Hour: Int, Time: String) {
         self.Hour = Hour
         self.Month = Month
         self.Day = Day
         self.Year = Year
         self.UIdata  = UIdata
+        self.Time = Time
     }
     
     
@@ -50,18 +52,28 @@ class DateModel: ObservableObject, Identifiable{
     
     
     /**
-     This is a settter for the hour of each date class. It takes in an integer ranging from 1-24. 1-12 representing the AM, 13-24 representing the PM
-     - Precondition: Hour must be between 1- and 24.
+     Time setter dependant on the user entered time via a string. IF userTime is set to "PM," then the 24 hour format will be subtracted by 12 "hours" to represent morning hours.
+     - Precondition:
      - Parameter hour: The hour to be set for each date object
      - returns: None
      */
     func setHour(hour: Int){
-        if(hour >= 13){
+        if(Time == "PM"){
             Hour = hour - 12
         }
-        else{
+        else if(Time == "AM" ){
             Hour = hour
         }
+    }
+    
+    /**
+     Setter to set userTime when declaring which time of day it is when declaring hour
+     - Parameter t: the string that will contain the user entered time of day
+     - returns: None
+     */
+    
+    func setTime(t: String){
+        Time = t
     }
     
     
@@ -100,6 +112,22 @@ class DateModel: ObservableObject, Identifiable{
     func getDate() -> String {
            return "\(Month)/\(Day)/\(Year)"
        }
+    
+/**
+   Relays private data stored in Hour
+ - Returns: Hour stored inside of the object
+ */
+    func getHour() -> String{
+        return "\(Hour)"
+    }
+    
+    /**
+     Relays private data stored inside of Time
+     - Returns: Time stored inside of the object
+     */
+    func getTime() -> String{
+        return "\(Time)"
+    }
     
     
     

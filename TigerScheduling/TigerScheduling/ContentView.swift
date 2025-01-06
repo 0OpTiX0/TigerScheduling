@@ -24,6 +24,7 @@ struct ContentView: View {
     let currentDay = Calendar.current.component(.day, from: Date())
     let currentMonth = Calendar.current.component(.month, from: Date())
     let currentHour = Calendar.current.component(.hour, from: Date())
+    
     @FocusState var signalFlag: Bool //will be used to reset the values once an object is passed to the list
     @FocusState private var amountIsFocused: Bool
     @State private var listOfDates: [DateModel]
@@ -47,7 +48,7 @@ struct ContentView: View {
         _reminderTime = State(initialValue: 1)
         _userTime = State(initialValue: "")
         
-        if (userHour >= 13) {
+        if (userHour >= 12) {
             _userTime = State(initialValue: "PM")
         }
         else{
@@ -91,7 +92,7 @@ struct ContentView: View {
                             else {
                                 ForEach(listOfDates) { date in
                                     VStack(alignment: .leading) {
-                                        Text(String(format: "%d/%d/%d", date.Month, date.Day, date.Year))
+                                        Text(String(format: "%d/%d/%d at: %d:00 %@", date.Month, date.Day, date.Year, date.Hour, date.Time))
                                             .font(.headline)
                                         
                                         Text(date.UIdata)
@@ -170,9 +171,10 @@ struct ContentView: View {
                             HStack(alignment: .center){
                                 Picker("Select Hour",selection: $userHour){
                                     ForEach(1...12, id: \.self) { hour in
-                                        Text("\(hour)").tag(hour) // Add tags to ensure proper selection handling
+                                        Text("\(hour):00").tag(hour) // Add tags to ensure proper selection handling
                                     }
                                 }
+                                
                                 .pickerStyle(.wheel)
                                 .frame(width: 200, height: 70)
                                 
@@ -191,20 +193,18 @@ struct ContentView: View {
                          
                          */
                         Section("When do you want to be reminded?"){
-                            HStack{
-                                Picker("Select when to be reminded", selection: $reminderTime){
-                                    ForEach(1...7, id: \.self){
-                                        reminder in Text("\(reminder)")
+                        
+                                Picker("Select when to be reminded", selection: $reminderTime) {
+                                    ForEach(0...7, id: \.self) { reminder in
+                                        Text("\(reminder) day\(reminder == 1 ? "" : "s") before")
                                     }
                                 }
                                 .pickerStyle(.wheel)
-                                .frame(width: 250, height:70 )
-                                
-                                Text("Day(s).")
-                
+                                .frame(height: 70)
+                            
                             }
                             
-                        }
+            
                         
                         
                         
@@ -221,11 +221,11 @@ struct ContentView: View {
                          Allows the user to add dates to their list
                          */
                         Button("Add Date") {
-                            let newItem = DateModel(Month: userMonth, Day: userDay, Year: userYear, UIdata: userData, Hour: userHour)
+                            let newItem = DateModel(Month: userMonth, Day: userDay, Year: userYear, UIdata: userData, Hour: userHour, Time: userTime)
                             listOfDates.append(newItem)
                             
-                            notifications(for: newItem)
-                            
+                            notifications(for: [newItem], daysInAdvance: reminderTime)
+
                             userHour = currentHour
                             userMonth = currentMonth
                             userDay = currentDay
@@ -264,65 +264,69 @@ struct ContentView: View {
         }
     }
     
-    
-    func notifications(for dateModels: DateModel){
+    func notifications(for dateModels: [DateModel], daysInAdvance: Int) {
         let hub = UNUserNotificationCenter.current()
         
-        for dateInstance in listOfDates {  // `dateInstance` is an instance of DateModel
+        for dateInstance in dateModels {  // Loop through all DateModel instances
             let addRequest = {
                 let content = UNMutableNotificationContent()
-                content.title = "Reminder for:  \(dateInstance.Month)/\(dateInstance.Day)/\(dateInstance.Year)"
+                content.title = "Reminder for: \(dateInstance.Month)/\(dateInstance.Day)/\(dateInstance.Year)"
                 content.subtitle = "To Do: \(dateInstance.UIdata)"
                 content.sound = UNNotificationSound.default
+
+                // Convert hour to 24-hour format based on AM/PM
+                let isPM = dateInstance.Time == "PM"
+                let hour24 = (isPM && dateInstance.Hour != 12 ? dateInstance.Hour + 12 : dateInstance.Hour % 12)
                 
-                // Use the instance's Month, Day, and Year
-                // Need to program hour and minute to get this to work. Work on it later.
-                var dateComponents = DateComponents()
-                dateComponents.hour = dateInstance.Hour
-                dateComponents.year = dateInstance.Year
-                dateComponents.month = dateInstance.Month
-                dateComponents.day = dateInstance.Day
+                // Calculate the adjusted reminder date
+                let calendar = Calendar.current
+                let originalDate = calendar.date(from: DateComponents(
+                    year: dateInstance.Year,
+                    month: dateInstance.Month,
+                    day: dateInstance.Day,
+                    hour: hour24
+                ))!
+                let adjustedDate = calendar.date(byAdding: .day, value: -daysInAdvance, to: originalDate)!
                 
+                // Extract the adjusted date components
+                let adjustedDateComponents = calendar.dateComponents([.year, .month, .day, .hour], from: adjustedDate)
                 
+                // Debugging output
+                print("Scheduling reminder for \(adjustedDateComponents.year!)-\(adjustedDateComponents.month!)-\(adjustedDateComponents.day!) at \(adjustedDateComponents.hour!)")
                 
-                /*
-                 let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
-                 */
-                // Create the trigger
-                
-                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-                
-                
+                // Create a trigger based on the adjusted date components
+                let trigger = UNCalendarNotificationTrigger(dateMatching: adjustedDateComponents, repeats: false)
+
                 // Create and add the notification request
                 let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
                 hub.add(request) { error in
                     if let error = error {
                         print("Error scheduling notification: \(error.localizedDescription)")
+                    } else {
+                        print("Notification successfully scheduled.")
                     }
                 }
             }
-            
-            
             
             // Check notification permissions
             hub.getNotificationSettings { settings in
                 if settings.authorizationStatus == .authorized {
                     addRequest()
-                }
-                else {
+                } else {
                     hub.requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
                         if success {
                             addRequest()
-                        }
-                        else if let error = error {
-                            print(error.localizedDescription)
+                        } else if let error = error {
+                            print("Authorization error: \(error.localizedDescription)")
                         }
                     }
                 }
             }
         }
     }
-}
+
+
+    }
     #Preview {
         ContentView()
     }

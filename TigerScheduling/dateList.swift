@@ -27,8 +27,8 @@ class dateList: ObservableObject {
      - Parameter uI: Any user input that will be displayed as a memo by UI.
      - Returns: A valid `date` object, or `nil` if the date is invalid.
      */
-    func createDate(month: Int, day: Int, year: Int, uI: String, hour: Int) -> DateModel? {
-        let newDate = DateModel(Month: month, Day: day, Year: year, UIdata: uI, Hour: hour)
+    func createDate(month: Int, day: Int, year: Int, uI: String, hour: Int, time: String) -> DateModel? {
+        let newDate = DateModel(Month: month, Day: day, Year: year, UIdata: uI, Hour: hour, Time: time)
 
         if !newDate.checkValidDate(entry: newDate) {
             print("Warning: Invalid date created - \(month)/\(day)/\(year)\n")
