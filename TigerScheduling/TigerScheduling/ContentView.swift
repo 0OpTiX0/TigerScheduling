@@ -4,7 +4,7 @@
 //
 //  Created by Joseph Laudati on 11/6/24.
 
-//  Copyright © 2024 Joseph Laudati. All rights reserved.
+//  Copyright © 2025 Joseph Laudati. All rights reserved.
 
 
 // '$' before a variable tells SwiftUI that a variable can be read or written into.
@@ -38,24 +38,17 @@ struct ContentView: View {
     @State private var reminderTime: Int
     
     //initalize values to current month, day and year so that your app launches with the correct date.
-    init(){
+    init() {
         _listOfDates = State(initialValue: [])
         _userDay = State(initialValue: currentDay)
         _userMonth = State(initialValue: currentMonth)
         _userYear = State(initialValue: currentYear)
-        _userHour = State(initialValue: currentHour)
+        _userHour = State(initialValue: currentHour > 12 ? currentHour - 12 : (currentHour == 0 ? 12 : currentHour))
         _userData = State(initialValue: "")
         _reminderTime = State(initialValue: 1)
-        _userTime = State(initialValue: "")
-        
-        if (userHour >= 12) {
-            _userTime = State(initialValue: "PM")
-        }
-        else{
-            _userTime = State(initialValue: "AM")
-        }
-        
+        _userTime = State(initialValue: currentHour >= 12 ? "PM" : "AM")
     }
+
     
     
     
@@ -178,7 +171,7 @@ struct ContentView: View {
                                 .pickerStyle(.wheel)
                                 .frame(width: 200, height: 70)
                                 
-                                Picker("What time of Day", selection: $times){
+                                Picker("What time of Day", selection: $userTime){
                                     ForEach(times, id: \.self){
                                         time in Text(time)
                                     }
@@ -221,22 +214,38 @@ struct ContentView: View {
                          Allows the user to add dates to their list
                          */
                         Button("Add Date") {
-                            let newItem = DateModel(Month: userMonth, Day: userDay, Year: userYear, UIdata: userData, Hour: userHour, Time: userTime)
+                            
+            
+                            
+                            
+                            
+                            // Initialize the DateModel with default or placeholder values
+                            let newItem = DateModel(Month: userMonth, Day: userDay, Year: userYear, UIdata: userData, Hour: 0, Time: "")
+
+                                // Use setters to configure the date and time
+                                newItem.setDate(day: userDay, month: userMonth, year: userYear)
+                                newItem.setHour(hour: userHour) // Converts 24-hour format to 12-hour format
+                                newItem.setTime(t: userTime)    // Sets "AM" or "PM"
+                            
+                            
+                            
+                            
+                            
                             listOfDates.append(newItem)
                             
                             notifications(for: [newItem], daysInAdvance: reminderTime)
 
-                            userHour = currentHour
+                            userHour = 1
                             userMonth = currentMonth
                             userDay = currentDay
                             userYear = currentYear
                             userData = ""
-                            
+                            userTime = "AM"
                         }
                         .font(.headline)
                         .frame(maxWidth: .infinity) // Makes the button expand horizontally
                         .multilineTextAlignment(.center) // aligns the text
-                        
+                        .disabled(userYear < currentYear || userYear > currentYear + 10 || userHour < 1)
                         
                         Button("Remove Date"){
                             if(!listOfDates.isEmpty){
@@ -275,8 +284,8 @@ struct ContentView: View {
                 content.sound = UNNotificationSound.default
 
                 // Convert hour to 24-hour format based on AM/PM
-                let isPM = dateInstance.Time == "PM"
-                let hour24 = (isPM && dateInstance.Hour != 12 ? dateInstance.Hour + 12 : dateInstance.Hour % 12)
+                
+                let hour24 = dateInstance.convertedTime()
                 
                 // Calculate the adjusted reminder date
                 let calendar = Calendar.current
@@ -291,39 +300,42 @@ struct ContentView: View {
                 // Extract the adjusted date components
                 let adjustedDateComponents = calendar.dateComponents([.year, .month, .day, .hour], from: adjustedDate)
                 
-                // Debugging output
-                print("Scheduling reminder for \(adjustedDateComponents.year!)-\(adjustedDateComponents.month!)-\(adjustedDateComponents.day!) at \(adjustedDateComponents.hour!)")
-                
-                // Create a trigger based on the adjusted date components
-                let trigger = UNCalendarNotificationTrigger(dateMatching: adjustedDateComponents, repeats: false)
+                // Generate a unique identifier for the notification
+                            let notificationID = "\(dateInstance.Month)-\(dateInstance.Day)-\(dateInstance.Year)-\(dateInstance.Hour)"
+                            
+                            // Store the notificationID in the DateModel
+                            dateInstance.notificationID = notificationID
+                            
+                            // Create a trigger based on the adjusted date components
+                            let trigger = UNCalendarNotificationTrigger(dateMatching: adjustedDateComponents, repeats: false)
 
-                // Create and add the notification request
-                let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
-                hub.add(request) { error in
-                    if let error = error {
-                        print("Error scheduling notification: \(error.localizedDescription)")
-                    } else {
-                        print("Notification successfully scheduled.")
-                    }
-                }
-            }
-            
-            // Check notification permissions
-            hub.getNotificationSettings { settings in
-                if settings.authorizationStatus == .authorized {
-                    addRequest()
-                } else {
-                    hub.requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
-                        if success {
-                            addRequest()
-                        } else if let error = error {
-                            print("Authorization error: \(error.localizedDescription)")
+                            // Create and add the notification request
+                            let request = UNNotificationRequest(identifier: notificationID, content: content, trigger: trigger)
+                            hub.add(request) { error in
+                                if let error = error {
+                                    print("Error scheduling notification: \(error.localizedDescription)")
+                                } else {
+                                    print("Notification successfully scheduled with ID: \(notificationID)")
+                                }
+                            }
+                        }
+                        
+                        // Check notification permissions
+                        hub.getNotificationSettings { settings in
+                            if settings.authorizationStatus == .authorized {
+                                addRequest()
+                            } else {
+                                hub.requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
+                                    if success {
+                                        addRequest()
+                                    } else if let error = error {
+                                        print("Authorization error: \(error.localizedDescription)")
+                                    }
+                                }
+                            }
                         }
                     }
                 }
-            }
-        }
-    }
 
 
     }

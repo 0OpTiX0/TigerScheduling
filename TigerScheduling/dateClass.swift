@@ -3,7 +3,7 @@
 //  TigerScheduling
 //
 //  Created by Joseph Laudati on 11/15/24.
-//  Copyright © 2024 Joseph Laudati. All rights reserved.
+//  Copyright © 2025 Joseph Laudati. All rights reserved.
 
 import Foundation
 
@@ -17,9 +17,10 @@ class DateModel: ObservableObject, Identifiable{
     @Published var Day: Int
     @Published var Year: Int
     @Published var UIdata: String
+    var notificationID: String?
     
     /**
-    Constructor initializes Month, Day, Year, and UI Data
+     Constructor initializes Month, Day, Year, and UI Data
      */
     init(Month: Int, Day: Int, Year: Int, UIdata: String, Hour: Int, Time: String) {
         self.Hour = Hour
@@ -52,71 +53,51 @@ class DateModel: ObservableObject, Identifiable{
     
     
     /**
-     Time setter dependant on the user entered time via a string. IF userTime is set to "PM," then the 24 hour format will be subtracted by 12 "hours" to represent morning hours.
-     - Precondition:
-     - Parameter hour: The hour to be set for each date object
-     - returns: None
+    Sets the object hour to the user's input
      */
-    func setHour(hour: Int){
-        if(Time == "PM"){
-            Hour = hour - 12
-        }
-        else if(Time == "AM" ){
-            Hour = hour
-        }
+    func setHour(hour: Int) {
+            self.Hour = hour
     }
+    
+    /**
+     Translates 12hr formatted times to 24hr times via a detector that looks to see if userTime is either "AM" or "PM"
+     - Precondition:hour must be within the 12hr format
+     - Parameter hour: The hour to be set for each date object
+     - returns: converted_24: the converted time.
+     */
+    func convertedTime()-> Int{
+        
+        
+        if(Time == "PM"){
+            return Hour + 12
+        }
+        else if(Time == "AM" && Hour == 12){
+            return 0
+        }
+        
+        return Hour
+        
+    }
+
+
+
     
     /**
      Setter to set userTime when declaring which time of day it is when declaring hour
      - Parameter t: the string that will contain the user entered time of day
-     - returns: None
+     - returns: none
      */
     
     func setTime(t: String){
-        Time = t
+        self.Time = t
     }
     
+
     
     /**
-     Stores user inputted data if they wish to enter a memo about an event they have.
-     This will take in data from the UI like the rest of the setters.
-     - Parameter message: string
-     - Returns: none
+     Relays private data stored in Hour
+     - Returns: Hour stored inside of the object
      */
-    func editMemo(message:String){
-        UIdata = message
-    }
-    
-    
-    
-    
-    
-    /**
-    Relays the objects UIdata
-     - Returns: Attached date message
-     
-     */
-    func viewMemo()->String{
-        return UIdata
-    }
-    
-    
-    
-    
-    
-    /**
-        Relays  private data stored in  Month, Day, and Year
-     
-   - Returns: Month, Day, and Year stored inside of the object.
-     */
-    func getDate() -> String {
-           return "\(Month)/\(Day)/\(Year)"
-       }
-    
-/**
-   Relays private data stored in Hour
- - Returns: Hour stored inside of the object
- */
     func getHour() -> String{
         return "\(Hour)"
     }
@@ -129,65 +110,91 @@ class DateModel: ObservableObject, Identifiable{
         return "\(Time)"
     }
     
-    
-    
-    
     /**
-     This function ensures valid dates by checking leap years, maxima and minima dates, correct months, and as well as preventing the creation of past dates.
-     - Parameter entry: the date that is to be checked (self)
-     - return : Boolean
+     Creates new date objects based on UI handled by the appController. It will store the month, year, day, and any user input regarded with it.
+     - Parameter month: The user-defined month.
+     - Parameter year: The user-defined year.
+     - Parameter day: The user-defined day.
+     - Parameter uI: Any user input that will be displayed as a memo by UI.
+     - Returns: A valid `date` object, or `nil` if the date is invalid.
      */
-    func checkValidDate(entry: DateModel)->Bool{
-        let today = Date()
-        var _: Int = Calendar.current.component(.day, from: today)
-        var _: Int = Calendar.current.component(.year, from: today)
-        var _: Int = Calendar.current.component(.month, from: today)
-        
-        //Boundary handling
-        if entry.Month > 12 || entry.Month < 1{
-            return false
+    static func createDate(month: Int, day: Int, year: Int, uI: String, hour: Int, time: String) -> DateModel? {
+        let newDate = DateModel(Month: month, Day: day, Year: year, UIdata: uI, Hour: hour, Time: time)
+     /* DEPRECIATED FOR NOW
+        if !newDate.checkValidDate(entry: newDate) {
+            print("Warning: Invalid date created - \(month)/\(day)/\(year)\n")
+            return nil
         }
-        
-        else if entry.Day < 1 || entry.Day > 31 {
-            return false
-        }
-        
-        else if (entry.Month == 1 || entry.Month == 3 || entry.Month == 5 || entry.Month == 7 || entry.Month == 8 || entry.Month == 10 || entry.Month == 12) && entry.Day > 31 {
-            return false
-        }
-        
-        else if (entry.Month == 4 || entry.Month == 6 || entry.Month == 9 || entry.Month == 11) && entry.Day > 30 {
-            return false
-        }
-        
-                
-        //leap year handling
-        else if entry.Month == 02{
-            //if it is not a leap year
-            if (entry.Year % 4 != 0 || (entry.Year % 100 == 0 && entry.Year % 400 != 0)) && entry.Day > 28 {
-                return false;
-            }
-            
-           //if it is a leap year
-            else if ((entry.Year % 4 == 0 && (entry.Year % 100 != 0 || entry.Year % 400 == 0))) && entry.Day > 29{
-                return false
-            }
-    
-        }
-        
-        // current date handling
-        let entryDate = Calendar.current.date(from: DateComponents(year: entry.Year, month: entry.Month, day: entry.Day)) ?? today
-        
-        if entryDate < today {
-                return false
-            }
-
-        
-        
-        
-        return true
+     */
+        return newDate
     }
     
     
-    //end of class for coding purposes
+    /*
+     
+     DEPRECIATED FOR NOW
+     
+     /**
+      This function ensures valid dates by checking leap years, maxima and minima dates, correct months, and as well as preventing the creation of past dates.
+      - Parameter entry: the date that is to be checked (self)
+      - return : Boolean
+      */
+     func checkValidDate(entry: DateModel)->Bool{
+     let today = Date()
+     var _: Int = Calendar.current.component(.day, from: today)
+     var _: Int = Calendar.current.component(.year, from: today)
+     var _: Int = Calendar.current.component(.month, from: today)
+     
+     //Boundary handling
+     if entry.Month > 12 || entry.Month < 1{
+     return false
+     }
+     
+     else if entry.Day < 1 || entry.Day > 31 {
+     return false
+     }
+     
+     else if (entry.Month == 1 || entry.Month == 3 || entry.Month == 5 || entry.Month == 7 || entry.Month == 8 || entry.Month == 10 || entry.Month == 12) && entry.Day > 31 {
+     return false
+     }
+     
+     else if (entry.Month == 4 || entry.Month == 6 || entry.Month == 9 || entry.Month == 11) && entry.Day > 30 {
+     return false
+     }
+     
+     
+     //leap year handling
+     else if entry.Month == 02{
+     //if it is not a leap year
+     if (entry.Year % 4 != 0 || (entry.Year % 100 == 0 && entry.Year % 400 != 0)) && entry.Day > 28 {
+     return false;
+     }
+     
+     //if it is a leap year
+     else if ((entry.Year % 4 == 0 && (entry.Year % 100 != 0 || entry.Year % 400 == 0))) && entry.Day > 29{
+     return false
+     }
+     
+     }
+     
+     // current date handling
+     let entryDate = Calendar.current.date(from: DateComponents(year: entry.Year, month: entry.Month, day: entry.Day)) ?? today
+     
+     if entryDate < today {
+     return false
+     }
+     
+     
+     
+     
+     return true
+     }
+     
+     
+     //end of class for coding purposes
+     /*
+      */*/
+    
+    
+    
 }
